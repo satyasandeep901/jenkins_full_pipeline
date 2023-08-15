@@ -1,0 +1,19 @@
+pipeline{
+    agent any
+    stages{
+        stage('buid_name'){
+            steps{
+                script{
+                    currentBuild.displayName = "Deployment"
+                    currentBuild.description = "This is deployment build"
+                    
+                }
+                echo 'build name changing'
+                
+            }
+            
+        }
+        
+    }
+    
+}

@@ -1,0 +1,102 @@
+                                               /Condotional and looping Statements
+
+/ IF Condition
+
+/ Example1
+
+pipeline{
+    agent any
+    environment{
+        Tools='maven'
+        
+    }
+    stages{
+        stage('conditions'){
+            steps{
+                script{
+                    if(Tools == 'Jenkins'){
+                        echo 'Tools is jenkins'
+                        
+                    }else{
+                        echo 'Tools is not jenkins '
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+
+/ Example2
+
+pipeline{
+    agent any
+    environment{
+        Tools='Jenkins'
+        
+    }
+    stages{
+        stage('conditions'){
+            steps{
+                script{
+                    int buildno="$BUILD_NUMBER"
+                    if(buildno %2 == 0){
+                        echo 'builno is even'
+                        
+                    }else{
+                        echo 'buildno is odd'
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+For loop
+
+/ Example3
+
+pipeline{
+    agent any
+    environment{
+        Tools='Jenkins'
+        
+    }
+    stages{
+        stage('conditions'){
+            steps{
+                script{
+                    for(i=0;i<=5;i++){
+                        println i
+                        
+                    }
+                    int buildno="$BUILD_NUMBER"
+                    if(buildno %2 == 0){
+                        echo 'builno is even'
+                        
+                    }else{
+                        echo 'buildno is odd'
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}

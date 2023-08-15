@@ -1,0 +1,19 @@
+pipeline{
+    agent any
+    stages{
+        stage('append data into file'){
+            steps{
+                echo 'Hello world'
+                sh '''ls -al
+                touch sandeep
+                echo "line-1" >> sandeep
+                echo "line-2" >> sandeep
+                cat sandeep'''
+                
+            }
+            
+        }
+        
+    }
+    
+}

@@ -1,0 +1,50 @@
+                                          / Cron Job
+pipeline {
+    agent any
+    options{
+        timestamps()
+        
+    }
+    triggers{
+        cron('* * * * *')
+        
+    }
+    stages {
+        stage("cron") {
+            steps { 
+                echo "heloo"
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+                                        / Poll SCM
+/ note:- By using this script it will be trigger the job automatically when we commit the changes to the repository. here in this we given the cron tab time fromat by using this given cron time our jenkins will check wheather if any commite are happened are not in every minute in our repository.
+
+pipeline {
+    agent any
+    options{
+        timestamps()
+        
+    }
+    triggers{
+        pollSCM('* * * * *')
+        
+    }
+    stages {
+        stage("cron") {
+            steps { 
+                echo "heloo"
+                git url:"https://github.com/kalaiarasan33/public.git"
+                
+            }
+            
+        }
+        
+    }
+    
+}

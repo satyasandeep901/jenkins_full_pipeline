@@ -1,0 +1,120 @@
+/ Example:-1 
+/ this pipeline is used to trigger the job1 and job2 or you can replace with other job names as well
+
+pipeline {
+    agent any
+    stages {
+        stage('triggerjob') {
+            steps {
+                build('job1')
+                build('job2')
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+/ Example2:-
+
+pipeline {
+    agent any
+    stages {
+        stage('triggerjob') {
+            steps {
+                build(job:'job1', propagate:false)  // By using this line if first job1 got failed then also jeb2 will trigger
+                build('job2')
+            }
+        }
+    }
+}
+
+/Example3:-
+
+pipeline {
+    agent any
+    stages {
+        stage('triggerjob') {
+            steps {
+                script{
+                    jobresult = build(job:'job1', propagate:false).result   // By using this script we can change the o/p result. like as per this script if job1 or job2 got failed then the result is unstable. if the both the jobs are passed then only the result is stable
+                    build('job2')
+                    if(jobresult=='FAILURE'){
+                        currentBuild.result='UNSTABLE'
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+/Example4
+
+pipeline {
+    agent any
+    parameters {
+        choice(
+            name: 'Nodes',
+            choices:"Linux\nMac",
+            description: "Choose Node!")
+            choice(
+                name: 'Versions',
+                choices:"3.4\n4.4",
+                description: "Build for which version?" )
+                string(
+                    name: 'Path',
+                    defaultValue:"/home/pencillr/builds/",
+                    description: "Where to put the build!")
+        
+    }
+    stages {
+        stage("build") {
+            steps {
+                script {
+                    echo "$Nodes"
+                    echo "$Versions"
+                    echo "$Path"
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+
+/Example5          
+               // By using this pipeline we can trigger above example 4 because in above script we included the input parameters. 
+
+pipeline {
+    agent any
+    stages {
+        stage("build") {
+            steps {
+                script {
+                    build(job: "trigger builds",
+                    parameters:
+                    [string(name: 'Nodes', value: "Linux"),
+                    string(name: 'Versions', value: "3.4"),
+                    string(name: 'Path', value: "/home/pencillr/builds/}")])
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}

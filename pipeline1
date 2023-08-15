@@ -1,0 +1,20 @@
+pipeline{
+    agent any
+    stages{
+        stage('Display the given message in pipeline'){
+            steps{
+                echo 'helloworld'
+            }
+        }
+        stage('create directory'){
+            steps{
+                sh 'mkdir sandeepfolder'
+                sh '''cd sandeepfolder
+                touch s1
+                ls -al
+                echo "hi this message is entered from jenkins pipeline" >> s1
+                cat s1'''
+            }
+        }
+    }
+}

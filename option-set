@@ -1,0 +1,115 @@
+/ Example:-1
+/ options:- we can provide this option in global level or stage level or step level
+/1)retry
+/2)timeout
+/3)timestamps
+/4)buildDiscarder
+/5)disableConcurrentBuilds
+
+                                                            //retry//
+pipeline {
+    agent any
+    stages {
+        stage('Deploy') {
+            options { 
+                retry(3)
+                timeout(time: 5, unit: 'SECONDS') 
+                
+            }
+            steps {
+                sh 'echo hello'
+                sleep(10)
+                
+            }
+            
+        }
+        
+    }
+    
+}
+                                                  //retry,timeout,timestamps//
+/ Example2:-
+/ timeout :- 
+timeout(time: 30, unit: 'MINUTES') 
+timeout(time: 30, unit: 'SECONDS') 
+timeout(time: 30, unit: 'HOURS') 
+
+/ note:- here this job will going to fail we did this intensionally because we need to see the options output
+/        in this pipeline we used retry,timestamps and timeout. so here we given wrong git url so it will try to pull or clone the repository in 5 times. 
+pipeline {
+    agent any
+    stages {
+        stage('Deploy') {
+            options { 
+                timestamps()
+                retry(5)
+                timeout(time: 30, unit: 'SECONDS')
+            }
+            steps {
+                sh 'echo hello'
+                sleep(5)
+                echo "hi sandeep"
+                sleep(5)
+                sh 'git clone https://github.com/sssandeep9999/test99.git'
+            }
+        }
+    }
+}
+
+                                           //buildDiscarder//
+/ Example3:-
+
+pipeline {
+    agent any
+    options { buildDiscarder(logRotator(numToKeepStr: '5')) }       // By using this line it will keep last 5 builds and it will delete remaining all builds.
+    stages {
+        stage('Deploy') {
+            steps {
+                sh 'echo hello'
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+/ Example4:-
+
+pipeline {
+    agent any
+    options {buildDiscarder(logRotator(daysToKeepStr: '7'))} )       // By using this line it will keep last 7 days builds and it will delete remaining all other days builds.
+    stages {
+        stage('Deploy') {
+            steps {
+                sh 'echo hello'
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+
+/ Example5:-
+
+pipeline {
+    agent any
+    options { 
+        buildDiscarder(logRotator(numToKeepStr: '10')) 
+        disableConcurrentBuilds()                          // By using this line it will aborted the build process it pipeline will got any conflect or error.
+        timeout(time: 5, unit: 'SECONDS') 
+        
+    }
+    stages {
+        stage('Deploy') {
+            steps {
+                sh 'echo hello'
+                //sleep(10)
+            }
+        }
+    }
+}

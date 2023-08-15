@@ -1,0 +1,98 @@
+pipeline{
+    agent any
+    stages{
+        stage('pre'){
+            steps{
+                echo " predefined variable $BUILD_NUMBER $WORKSPACE "
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+/--------------------------------or--------------------------------------
+/ jenkins pipeline-2 for predefined variables
+/------------------------------------------------------------------------
+
+//DEFAULT VARIABLES or pre defined variables
+
+pipeline{
+    agent any
+    stages{
+        stage('predefined variables'){
+            steps{
+                echo "predefined variables Current Build Number=$BUILD_NUMBER JENKINS Default Workspace=$WORKSPACE"
+            }
+        }
+    }
+}
+
+
+
+/--------------------------------or--------------------------------------
+/ jenkins pipeline-3 for user defined variables
+/------------------------------------------------------------------------
+/ As a user we can define variables in three ways 
+/ 1.Global level
+/ 2.Stage level
+/ 3.Script level
+
+pipeline{
+    agent any
+    environment{                               / global variable
+        MYHOMETOWN="Attili"
+    }
+    stages{
+        stage('global variable'){
+            steps{
+                echo "what is your home town=$MYHOMETOWN"
+            }
+        }
+        stage('USER variable'){
+            environment{                          / user define variable
+                    MYHOMETOWN="SANDEEP"
+                }
+            steps{
+                script{
+                    MYHOMETOWN="S S SANDEEP"        / script level variable
+                }
+                echo "what is your home town=$MYHOMETOWN"
+                echo "what is your home town=${env.MYHOMETOWN}"
+            }
+        }
+    }
+}
+
+
+/--------------------------------or--------------------------------------
+/ jenkins pipeline-4 for user defined variables
+/------------------------------------------------------------------------
+
+pipeline{
+    agent any
+    environment{
+        MYHOME="Chennai"
+        
+    }
+    stages{
+        stage('User'){
+            environment{
+                MYHOME="Andhra Pradesh"
+                
+            }
+            steps{
+                script{
+                    MYHOME="chen"
+                    
+                }
+                echo """userdefined variable $MYHOME previous variable ${env.MYHOME}
+                       userdefined variable $MYHOME previous variable ${env.MYHOME}"""
+                
+            }
+            
+        }
+        
+    }

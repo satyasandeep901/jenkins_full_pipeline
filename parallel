@@ -1,0 +1,142 @@
+                                                / Parallel
+pipeline {
+    agent any
+    stages {
+        stage("build") {
+            parallel{             // By using this line all the stage will be execute at the as time/ at-a-time
+                stage('job1'){
+                    steps{
+                        echo "job1"
+                        
+                    }
+                    
+                }
+                stage('job2'){
+                    steps{
+                        echo "job2"
+                        
+                    }
+                    
+                } 
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+/                                      or
+
+/ Example2:-
+
+pipeline {
+    agent any
+    options{
+        timestamps()
+        
+    }
+    stages {
+        stage("stage1") {
+            parallel{
+                stage('stage1job1'){
+                    steps{
+                        echo "stage1job1"
+                        sleep(10)
+                        
+                    }
+                    
+                }
+                stage('stage1job2'){
+                    steps{
+                        echo "stage1job2"
+                        sleep(10)
+                        
+                    }
+                    
+                } 
+                
+            }
+            
+        }
+        stage("stage2") {
+            parallel{
+                stage('stage2job1'){
+                    steps{
+                        echo "stage2job1"
+                        sleep(5)
+                        
+                    }
+                    
+                }
+                stage('stage2job2'){
+                    steps{
+                        echo "stage2job2"
+                        sleep(5)
+                        
+                    }
+                    
+                } 
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+                                      / failfast
+/ Example1:-
+
+pipeline {
+    agent any
+    options{
+        timestamps()
+        
+    }
+    stages {
+        stage("stage1") {
+            failFast true
+            parallel{
+                stage('stage1job1'){
+                    steps{
+                        echo "stage1job1"
+                        sleep(10)
+                        
+                    }
+                    
+                }
+                stage('stage1job2'){
+                    steps{
+                        eecho "stage1job2"
+                        sleep(10)
+                        
+                    }
+                    
+                } 
+                stage('stage2job1'){
+                    steps{
+                        echo "stage2job1"
+                        sleep(5)
+                        
+                    }
+                    
+                }
+                stage('stage2job2'){
+                    steps{
+                        echo "stage2job2"
+                        sleep(5)
+                        
+                    }
+                    
+                } 
+                
+            }
+            
+        }
+        
+    }
+    
+}

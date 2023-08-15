@@ -1,0 +1,10 @@
+pipeline{
+    agent any
+    stages{
+        stage('Display the given message in pipeline'){
+            steps{
+                echo 'helloworld'
+            }
+        }
+    }
+}
