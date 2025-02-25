@@ -1,0 +1,90 @@
+
+// note:- By using this pipeline we can build frontend node.js application and backend java application and deploy data base and deploy our backend and frontend applications with the help of docker container through jenkins pipeline and establish communication with database.
+
+pipeline {              // The pipeline block is the main structure of the Jenkins pipeline. Everything defined inside this block only. blocks like agent block,tools,options,parameters and triggers,environment,timestamp......  
+    agent any           // This tells Jenkins that the pipeline can run on any available agent (Jenkins node). If you have specific agents (e.g., a dedicated build server), you can specify them here
+
+
+    environment {              // this block is used to define environmrnt variables
+        NODE_VERSION = '18'  // Node.js version for frontend
+        JAVA_VERSION = '17'   // Java version for backend
+        MYSQL_CONTAINER = 'mysql_container'
+    }
+
+
+    stages {     // this is the stages block to hold all of the stage blocks
+        stage('Checkout Code') {   // It Pulls the latest code from the main branch.
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo/three-tier-app.git'
+            }
+        }
+
+
+        stage('Build Frontend') { // This Stage Build Frontend Code
+            agent {
+                docker {
+                    image 'node:${NODE_VERSION}'  // It Runs inside a Node.js Docker container (using the specified version 18).
+                }
+            }
+            steps {
+                dir('frontend') {    // It Changes directory to frontend using dir('frontend').
+                    sh 'npm install'  // Installs dependencies using npm install.
+                    sh 'npm run build' // Builds the frontend using npm run build.
+                }
+            }
+        }
+
+
+        stage('Build Backend') {
+            agent {
+                docker {
+                    image 'maven:3.8.5-openjdk-${JAVA_VERSION}'  // It Runs inside a Maven Docker container (maven:3.8.5-openjdk-17).
+                }
+            }
+            steps {
+                dir('backend') {           // It Changes directory to backend.
+                    sh 'mvn clean package' // Builds the Spring Boot application using mvn clean package.
+                }
+            }
+        }
+
+
+        stage('Deploy Database') {
+            steps {
+                script {
+                    sh "docker run -d --name ${MYSQL_CONTAINER} -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=mydb -p 3306:3306 mysql:latest"  // It Uses docker run to start a MySQL container. -d → Runs the container in the background. --name ${MYSQL_CONTAINER} → Assigns a name to the container. -e MYSQL_ROOT_PASSWORD=root → Sets the root password for MySQL to root. -e MYSQL_DATABASE=mydb → Creates a database named mydb inside MySQL. -p 3306:3306 → Maps port 3306 of the container to port 3306 on the host machine. This allows other applications (like the backend) to connect to MySQL. mysql:latest → Uses the latest official MySQL Docker image.
+                }
+            }
+        }
+
+
+        stage('Deploy Backend') {
+            steps {
+                script {
+                    sh 'docker build -t backend-image ./backend' // docker build → Builds a Docker image from a Dockerfile. -t backend-image → Assigns a tag (backend-image) to the built image. ./backend → Specifies that the Dockerfile is located in the backend directory.
+                    sh 'docker run -d -p 8080:8080 --name backend-container --link mysql_container:mysql backend-image'  // docker run → Runs a container from an image. -d → Runs the container in detached mode (in the background). -p 8080:8080 → Maps port 8080 from the container to port 8080 on the host. This allows external access to the backend API. --name backend-container → Names the container as backend-container. --link mysql_container:mysql → Links this container to mysql_container, allowing the backend to communicate with the database. backend-image → Uses the previously built image named backend-image.
+                }
+            }
+        }
+
+
+        stage('Deploy Frontend') {
+            steps {
+                script {
+                    sh 'docker build -t frontend-image ./frontend'  // docker build → It Builds a Docker image from a Dockerfile. -t frontend-image → Assigns a tag (frontend-image) to the built image. ./frontend → It Specifies that the Dockerfile is inside the frontend directory.
+                    sh 'docker run -d -p 3000:3000 --name frontend-container --link backend-container:backend frontend-image'  // docker run → Runs a container from an image. -d → Runs it in detached mode. -p 3000:3000 → Maps port 3000 from the container to port 3000 on the host. This allows users to access the frontend app via http://localhost:3000. --name frontend-container → Names the container frontend-container. --link backend-container:backend → It Links this container to backend-container so it can communicate with the backend. frontend-image → Uses the previously built frontend-image.
+                }
+            }
+        }
+    }
+
+
+    post {                // it Defines what should happen after the pipeline finishes.
+        success {
+            echo 'Deployment successful!' // If everything runs successfully: Jenkins prints "Deployment successful!" in the console.
+        }
+        failure {
+            echo 'Deployment failed! Check logs.'   // If something fails: Jenkins prints "Deployment failed! Check logs.".
+        }
+    }
+}
